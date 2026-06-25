@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>小小糖美甲报价小助手</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF3F6;
+  --surface:#fff;
+  --border:#EDD5E0;
+  --accent:#C04070;
+  --accent2:#E06888;
+  --al:#FCEAF0;
+  --al2:#FFF0F5;
+  --text:#1E0F18;
+  --t2:#6B4558;
+  --t3:#B08898;
+  --gold:#C8963C;
+  --r:16px;
+  --rs:10px;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Helvetica Neue',sans-serif;font-size:15px;padding-bottom:90px}
+
+/* ── Header ── */
+.hd{background:linear-gradient(135deg,#B83060 0%,#D85880 50%,#E878A0 100%);padding:18px 16px 14px;color:#fff;position:sticky;top:0;z-index:100;box-shadow:0 3px 16px rgba(180,48,96,.35)}
+.hd-row{display:flex;align-items:center;justify-content:space-between}
+.hd h1{font-size:17px;font-weight:800;letter-spacing:.3px}
+.hd p{font-size:11px;opacity:.75;margin-top:3px;letter-spacing:.5px}
+.rst{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.5);color:#fff;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.3px}
+.rst:active{background:rgba(255,255,255,.3)}
+
+/* ── Section ── */
+.sec{margin:12px 12px 0;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;box-shadow:0 2px 8px rgba(180,48,96,.05)}
+.sec-ttl{padding:10px 14px;font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:linear-gradient(90deg,var(--al2),#fff)}
+.sec-ttl .bar{width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent2));flex-shrink:0}
+.sec-note{font-size:10px;color:var(--t3);font-weight:500;letter-spacing:0;margin-left:auto;background:var(--al);padding:2px 7px;border-radius:10px}
+
+/* ── 单排 item ── */
+.item{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.item:last-child{border-bottom:none}
+.item:active{background:var(--al)}
+.item.selected{background:var(--al2)}
+
+.chk{width:21px;height:21px;border-radius:6px;border:2px solid var(--border);margin-right:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.item.selected .chk{background:var(--accent);border-color:var(--accent);box-shadow:0 2px 6px rgba(192,64,112,.4)}
+.item.selected .chk::after{content:'';width:4px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
+.radio .chk{border-radius:50%}
+.item.radio.selected .chk::after{width:7px;height:7px;border:none;background:#fff;border-radius:50%;transform:none}
+
+.i-info{flex:1;min-width:0}
+.i-name{font-size:14px;font-weight:600;color:var(--text)}
+.i-desc{font-size:11px;color:var(--t3);margin-top:2px}
+.i-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.i-price{font-size:14px;font-weight:800;color:var(--accent);white-space:nowrap}
+.i-price .hint{font-size:10px;font-weight:400;color:var(--t3)}
+
+/* ── 计数器 ── */
+.ctr{display:none;align-items:center;background:var(--al);border-radius:20px;overflow:hidden;border:1px solid var(--border)}
+.item.selected .ctr{display:flex}
+.cb{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--accent);cursor:pointer;user-select:none}
+.cb:active{background:var(--accent);color:#fff}
+.cn{min-width:22px;text-align:center;font-size:13px;font-weight:800;color:var(--accent)}
+
+/* ── 蹭粉范围 ── */
+.scope-row{display:none;background:var(--al2);border-top:1px solid var(--border);padding:8px 14px 10px;gap:8px}
+.scope-row.show{display:flex}
+.sbtn{flex:1;padding:7px 0;text-align:center;border-radius:8px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:#fff;color:var(--t2);cursor:pointer;transition:all .15s}
+.sbtn.active{border-color:var(--accent);background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(192,64,112,.3)}
+
+/* ── Chip 双排 ── */
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 12px;border-top:1px solid var(--border);background:var(--al2)}
+.chip{display:flex;align-items:center;gap:8px;padding:10px 11px;border-radius:var(--rs);border:1.5px solid var(--border);background:#fff;cursor:pointer;transition:all .15s;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.chip:active{transform:scale(.97)}
+.chip.selected{background:var(--al2);border-color:var(--accent);box-shadow:0 2px 8px rgba(192,64,112,.15)}
+.c-chk{width:17px;height:17px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.chip.selected .c-chk{background:var(--accent);border-color:var(--accent);box-shadow:0 1px 4px rgba(192,64,112,.4)}
+.chip.selected .c-chk::after{content:'';width:3px;height:6px;border:1.5px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);display:block}
+.c-name{flex:1;font-size:13px;font-weight:600;color:var(--text)}
+.c-price{font-size:12px;font-weight:800;color:var(--accent);white-space:nowrap}
+
+/* ── 展开更多 ── */
+.more-btn{padding:11px 14px;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;color:var(--accent);font-size:13px;font-weight:700;border-top:1px solid var(--border);background:var(--al2)}
+.more-arrow{font-size:10px;transition:transform .25s}
+
+/* ── 报价明细 ── */
+.qbox{display:none;margin:12px 12px 0;background:var(--surface);border-radius:var(--r);border:1px solid var(--border);overflow:hidden;box-shadow:0 3px 12px rgba(180,48,96,.1)}
+.qbox.show{display:block}
+.q-ttl{padding:10px 14px;font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;background:linear-gradient(90deg,var(--al2),#fff)}
+.q-ttl .bar{width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent2));flex-shrink:0}
+.qline{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:13px;border-bottom:1px dashed var(--border)}
+.qline:last-child{border-bottom:none}
+.qn{color:var(--t2);font-weight:500}
+.qp{font-weight:800;color:var(--text)}
+.qtot{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-top:2px solid var(--al);background:linear-gradient(135deg,var(--al2),#fff9fc)}
+.qtot-l{font-size:15px;font-weight:800;color:var(--text)}
+.qtot-r{display:flex;flex-direction:column;align-items:flex-end}
+.qtot-raw{font-size:11px;color:var(--t3);text-decoration:line-through;min-height:15px}
+.qtot-fin{font-size:26px;font-weight:900;color:var(--accent);letter-spacing:-1px}
+
+/* ── 复制按钮（页面内，明细下方） ── */
+.copy{display:none;margin:10px 12px 0;width:calc(100% - 24px);padding:13px;text-align:center;background:var(--al2);color:var(--accent);border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;font-weight:700;cursor:pointer;}
+.copy.show{display:block}
+.copy:active{opacity:.8}
+
+/* ── 悬浮底栏 ── */
+.fab{
+  position:fixed;bottom:0;left:0;right:0;z-index:200;
+  background:#fff;
+  border-top:1.5px solid var(--border);
+  box-shadow:0 -4px 20px rgba(180,48,96,.15);
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  display:none;
+  align-items:center;
+  gap:12px;
+}
+.fab.show{display:flex}
+.fab-info{flex:1;min-width:0}
+.fab-items{font-size:11px;color:var(--t3);margin-bottom:2px}
+.fab-prices{display:flex;align-items:baseline;gap:6px}
+.fab-raw{font-size:11px;color:var(--t3);text-decoration:line-through}
+.fab-final{font-size:24px;font-weight:900;color:var(--accent);letter-spacing:-1px;line-height:1}
+.fab-final .sym{font-size:14px;font-weight:700;letter-spacing:0}
+.fab-btn{
+  flex-shrink:0;
+  background:linear-gradient(135deg,#C04070,#A02858);
+  color:#fff;border:none;
+  border-radius:12px;
+  padding:12px 18px;
+  font-size:14px;font-weight:800;
+  letter-spacing:.5px;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(192,64,112,.4);
+  white-space:nowrap;
+}
+.fab-btn:active{opacity:.88;transform:scale(.98)}
+
+/* ── 子分类标题 ── */
+.sub-ttl{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;font-size:13px;font-weight:700;color:var(--t2);cursor:pointer;border-top:1px solid var(--border);background:var(--al2);user-select:none}
+.sub-ttl:active{background:var(--al)}
+.sub-arrow{font-size:10px;color:var(--t3);transition:transform .2s}
+
+/* ── 自定义款式 ── */
+.custom-add{padding:12px 14px;color:var(--accent);font-size:14px;font-weight:700;cursor:pointer;text-align:center;border-top:1px dashed var(--border);background:var(--al2);letter-spacing:.3px}
+.custom-add:active{background:var(--al)}
+.custom-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border)}
+.custom-row input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;outline:none}
+.custom-row input:focus{border-color:var(--accent)}
+.custom-row .price-inp{width:72px;flex:none}
+.custom-row .del{width:28px;height:28px;border-radius:50%;background:var(--al);border:none;color:var(--accent);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.custom-row .del:active{background:var(--accent);color:#fff}
+
+/* ── Toast ── */
+/* ── 管理款式弹窗 ── */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:flex-end}
+.modal-mask.show{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:0 0 env(safe-area-inset-bottom)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 12px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#fff;z-index:1}
+.modal-hd h2{font-size:16px;font-weight:800;color:var(--text)}
+.modal-close{width:30px;height:30px;border-radius:50%;background:var(--al);border:none;font-size:18px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:12px}
+.m-sec-ttl{font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.6px;margin:14px 0 8px;text-transform:uppercase}
+.saved-item{display:flex;align-items:center;padding:10px 12px;background:var(--al2);border-radius:10px;margin-bottom:6px;gap:8px}
+.saved-item .s-name{flex:1;font-size:14px;font-weight:600}
+.saved-item .s-price{font-size:13px;font-weight:700;color:var(--accent)}
+.saved-item .s-cat{font-size:11px;color:var(--t3);margin-left:4px}
+.saved-item .s-del{width:26px;height:26px;border-radius:50%;background:#fff;border:1.5px solid var(--border);color:var(--t3);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.saved-item .s-del:active{background:#fee;border-color:#e88;color:#e44}
+.add-form{background:var(--al2);border-radius:12px;padding:14px;margin-top:8px}
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;letter-spacing:.3px}
+.form-row input,.form-row select{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none}
+.form-row input:focus,.form-row select:focus{border-color:var(--accent)}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.edit-item{background:var(--al2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.edit-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.edit-row2{display:flex;align-items:center;gap:6px}
+.edit-name{flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 9px;font-size:14px;font-weight:600;font-family:inherit;color:var(--text);background:#fff;outline:none}
+.edit-name:focus{border-color:var(--accent)}
+.edit-field{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:7px;background:#fff;padding:0 8px;gap:3px;width:72px;flex-shrink:0}
+.edit-field label{font-size:13px;font-weight:700;color:var(--accent)}
+.edit-price{width:44px;border:none;font-size:13px;font-weight:700;color:var(--text);background:transparent;outline:none;padding:7px 0}
+.edit-sel{flex:1;border:1.5px solid var(--border);border-radius:7px;padding:7px 5px;font-size:11px;font-family:inherit;color:var(--t2);background:#fff;outline:none;min-width:0}
+.edit-sel:focus{border-color:var(--accent)}
+
+.save-btn{width:100%;padding:13px;background:linear-gradient(135deg,#C04070,#A02858);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px}
+.save-btn:active{opacity:.85}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(20,8,16,.9);color:#fff;padding:9px 20px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-row">
+    <div><h1>💅 小小糖美甲报价小助手</h1><p>选择工艺 · 实时计算</p></div>
+    <div style="display:flex;gap:8px">
+      <button class="rst" onclick="openManage()">⚙️ 管理</button>
+      <button class="rst" onclick="resetAll()">清空</button>
+    </div>
+  </div>
+</div>
+
+<!-- ① 基础 -->
+<div class="sec">
+  <div class="sec-ttl"><div class="bar"></div>① 基础 <span class="sec-note">必选一项</span></div>
+  <div class="item radio" data-group="base" data-price="68" data-name="本甲" onclick="pickBase(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">本甲</div></div>
+    <div class="i-price">¥68</div>
+  </div>
+  <div class="item radio" data-group="base" data-price="118" data-name="甲片 / 半贴延长" onclick="pickBase(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">甲片 / 半贴延长</div></div>
+    <div class="i-price">¥118</div>
+  </div>
+  <div id="base-more" style="display:none">
+    <div class="item radio" data-group="base" data-price="148" data-name="浅贴延长" onclick="pickBase(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">浅贴延长</div></div>
+      <div class="i-price">¥148</div>
+    </div>
+    <div class="item radio" data-group="base" data-price="98" data-name="甲片二次利用" onclick="pickBase(this)">
+      <div class="chk"></div>
+      <div class="i-info"><div class="i-name">甲片二次利用</div><div class="i-desc">仅限本店作品</div></div>
+      <div class="i-price">¥98</div>
+    </div>
+  </div>
+  <div class="more-btn" onclick="toggleMore()">
+    <span id="more-txt">更多选项</span>
+    <span class="more-arrow" id="more-arrow">▼</span>
+  </div>
+</div>
+
+<!-- ② 底色质感 -->
+<div class="sec">
+  <div class="sec-ttl"><div class="bar"></div>② 底色质感 <span class="sec-note">可多选叠加</span></div>
+
+  <!-- 猫眼 +20 【高频】 -->
+  <div class="item" data-key="cat" data-price="20" data-name="猫眼" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">猫眼</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('cat',-1)">−</div><div class="cn" id="n-cat">1</div><div class="cb" onclick="adj('cat',1)">＋</div>
+      </div>
+      <div class="i-price">+¥20 <span style="font-size:10px;font-weight:400;color:var(--t3)">跳色+¥5/色</span></div>
+    </div>
+  </div>
+
+  <!-- 渐变 +20 【高频】 -->
+  <div class="item" data-key="grad" data-price="20" data-name="渐变" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">渐变</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('grad',-1)">−</div><div class="cn" id="n-grad">1</div><div class="cb" onclick="adj('grad',1)">＋</div>
+      </div>
+      <div class="i-price">+¥20 <span style="font-size:10px;font-weight:400;color:var(--t3)">跳色+¥5/色</span></div>
+    </div>
+  </div>
+  <div class="scope-row" id="grad-scope">
+    <div class="sbtn active" id="grad-all" onclick="setGradScope('all')">全手 +¥20</div>
+    <div class="sbtn" id="grad-one" onclick="setGradScope('one')">一组 +¥5</div>
+  </div>
+  <div id="grad-groups-row" style="display:none;background:var(--al2);border-top:1px solid var(--border);padding:8px 14px;align-items:center;gap:10px">
+    <span style="font-size:12px;color:var(--t2);font-weight:600;flex:1">组数</span>
+    <div style="display:flex;align-items:center;background:var(--al);border-radius:20px;border:1px solid var(--border);overflow:hidden">
+      <div class="cb" onclick="adj('grad_groups',-1)">−</div><div class="cn" id="n-grad_groups">1</div><div class="cb" onclick="adj('grad_groups',1)">＋</div>
+    </div>
+  </div>
+
+  <!-- 腮红 +20 【高频】 -->
+  <div class="item" data-key="blush" data-price="20" data-name="腮红（全手）" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">腮红</div></div>
+    <div class="i-right"><div class="i-price">+¥20</div></div>
+  </div>
+  <div class="scope-row" id="blush-scope">
+    <div class="sbtn active" id="blush-all" onclick="setBlushScope('all')">全手 +¥20</div>
+    <div class="sbtn" id="blush-one" onclick="setBlushScope('one')">一组 +¥5</div>
+  </div>
+  <div id="blush-groups-row" style="display:none;background:var(--al2);border-top:1px solid var(--border);padding:8px 14px;align-items:center;gap:10px">
+    <span style="font-size:12px;color:var(--t2);font-weight:600;flex:1">组数</span>
+    <div style="display:flex;align-items:center;background:var(--al);border-radius:20px;border:1px solid var(--border);overflow:hidden">
+      <div class="cb" onclick="adj('blush_groups',-1)">−</div><div class="cn" id="n-blush_groups">1</div><div class="cb" onclick="adj('blush_groups',1)">＋</div>
+    </div>
+  </div>
+
+  <!-- 蹭粉 +30 【高频】 -->
+  <div class="item" data-key="rub" data-price="30" data-name="蹭粉（全手）" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">蹭粉</div></div>
+    <div class="i-right"><div class="i-price">+¥30</div></div>
+  </div>
+  <div class="scope-row" id="rub-scope">
+    <div class="sbtn active" id="rub-all" onclick="setScope('all')">全手 +¥30</div>
+    <div class="sbtn" id="rub-two" onclick="setScope('two')">一组 +¥8</div>
+  </div>
+  <div id="rub-groups-row" style="display:none;background:var(--al2);border-top:1px solid var(--border);padding:8px 14px;align-items:center;gap:10px">
+    <span style="font-size:12px;color:var(--t2);font-weight:600;flex:1">组数</span>
+    <div style="display:flex;align-items:center;background:var(--al);border-radius:20px;border:1px solid var(--border);overflow:hidden">
+      <div class="cb" onclick="adj('rub_groups',-1)">−</div><div class="cn" id="n-rub_groups">1</div><div class="cb" onclick="adj('rub_groups',1)">＋</div>
+    </div>
+  </div>
+
+  <!-- 醋酸 +10/指 【高频】 -->
+  <div class="item" data-key="acid" data-price="10" data-name="醋酸" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">醋酸</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('acid',-1)">−</div><div class="cn" id="n-acid">1</div><div class="cb" onclick="adj('acid',1)">＋</div>
+      </div>
+      <div class="i-price">+¥10/指</div>
+    </div>
+  </div>
+
+  <!-- 折叠：其他底色工艺 -->
+  <div class="more-btn" onclick="toggleColor()">
+    <span id="color-txt">更多工艺</span>
+    <span class="more-arrow" id="color-arrow">▼</span>
+  </div>
+  <div id="color-more" style="display:none">
+
+    <!-- 撒粉 +5/组 -->
+    <div class="item" data-key="dust" data-price="5" data-name="撒粉" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">撒粉</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('dust',-1)">−</div><div class="cn" id="n-dust">1</div><div class="cb" onclick="adj('dust',1)">＋</div>
+        </div>
+        <div class="i-price">+¥5/组</div>
+      </div>
+    </div>
+
+    <!-- 亮片 +5 -->
+    <div class="item" data-key="glitter" data-price="5" data-name="亮片" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">亮片</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('glitter',-1)">−</div><div class="cn" id="n-glitter">1</div><div class="cb" onclick="adj('glitter',1)">＋</div>
+        </div>
+        <div class="i-price">+¥5/次</div>
+      </div>
+    </div>
+
+    <!-- 调色 +10 -->
+    <div class="item" data-key="tiaose" data-price="10" data-name="调色" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">调色</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('tiaose',-1)">−</div><div class="cn" id="n-tiaose">1</div><div class="cb" onclick="adj('tiaose',1)">＋</div>
+        </div>
+        <div class="i-price">+¥10/次</div>
+      </div>
+    </div>
+
+    <!-- AB款式 +10 -->
+    <div class="item" data-key="ab" data-price="10" data-name="AB款式" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">AB款式</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('ab',-1)">−</div><div class="cn" id="n-ab">1</div><div class="cb" onclick="adj('ab',1)">＋</div>
+        </div>
+        <div class="i-price">+¥10/次</div>
+      </div>
+    </div>
+
+    <!-- 碎钻胶 +20 -->
+    <div class="item" data-key="glitter_gel" data-price="20" data-name="碎钻胶" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">碎钻胶</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('glitter_gel',-1)">−</div><div class="cn" id="n-glitter_gel">1</div><div class="cb" onclick="adj('glitter_gel',1)">＋</div>
+        </div>
+        <div class="i-price">+¥20/次</div>
+      </div>
+    </div>
+
+    <div id="custom-color"></div>
+  </div>
+</div>
+<div class="sec">
+  <div class="sec-ttl"><div class="bar"></div>③ 图案装饰 <span class="sec-note">手绘1组=两指</span></div>
+
+  <!-- 简单手绘 +5 【常用】 -->
+  <div class="item" data-key="draw_s" data-price="5" data-name="简单手绘" onclick="toggle(this)">
+    <div class="chk"></div>
+    <div class="i-info"><div class="i-name">简单手绘</div><div class="i-desc">波点·表情·星星·爱心·四芒星</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('draw_s',-1)">−</div><div class="cn" id="n-draw_s">1</div><div class="cb" onclick="adj('draw_s',1)">＋</div>
+      </div>
+      <div class="i-price">+¥5/组</div>
+    </div>
+  </div>
+
+  <!-- 复杂手绘 +8 【常用】 -->
+  <div class="item" data-key="draw_complex2" data-price="8" data-name="复杂手绘" onclick="toggle(this)">
+    <div class="chk"></div>
+    <div class="i-info"><div class="i-name">复杂手绘</div><div class="i-desc">唇印等复杂图案</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('draw_complex2',-1)">−</div><div class="cn" id="n-draw_complex2">1</div><div class="cb" onclick="adj('draw_complex2',1)">＋</div>
+      </div>
+      <div class="i-price">+¥8/组</div>
+    </div>
+  </div>
+
+  <!-- 贴纸 +5 【常用】 -->
+  <div class="item" data-key="draw_sticker2" data-price="5" data-name="贴纸" onclick="toggle(this)">
+    <div class="chk"></div>
+    <div class="i-info"><div class="i-name">贴纸</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('draw_sticker2',-1)">−</div><div class="cn" id="n-draw_sticker2">1</div><div class="cb" onclick="adj('draw_sticker2',1)">＋</div>
+      </div>
+      <div class="i-price">+¥5/组</div>
+    </div>
+  </div>
+
+  <!-- 法式 +10 【常用】 -->
+  <div class="item" data-key="draw_french" data-price="10" data-name="法式" onclick="toggle(this)">
+    <div class="chk"></div><div class="i-info"><div class="i-name">法式</div></div>
+    <div class="i-right">
+      <div class="ctr" onclick="event.stopPropagation()">
+        <div class="cb" onclick="adj('draw_french',-1)">−</div><div class="cn" id="n-draw_french">1</div><div class="cb" onclick="adj('draw_french',1)">＋</div>
+      </div>
+      <div class="i-price">+¥10/组</div>
+    </div>
+  </div>
+  <div class="scope-row" id="french-scope">
+    <div class="sbtn" id="french-group" onclick="setFrenchScope('group')">按组 +¥10</div>
+    <div class="sbtn active" id="french-full" onclick="setFrenchScope('full')">全手 +¥50</div>
+  </div>
+
+  <!-- 折叠：其他图案 -->
+  <div class="more-btn" onclick="toggleDraw()">
+    <span id="draw-txt">更多图案</span>
+    <span class="more-arrow" id="draw-arrow">▼</span>
+  </div>
+  <div id="draw-more" style="display:none">
+
+    <!-- 贴纸法式拍拍胶 +5 -->
+    <div class="item" data-key="draw_sticker" data-price="5" data-name="贴纸法式拍拍胶" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">贴纸法式拍拍胶</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('draw_sticker',-1)">−</div><div class="cn" id="n-draw_sticker">1</div><div class="cb" onclick="adj('draw_sticker',1)">＋</div>
+        </div>
+        <div class="i-price">+¥5/组</div>
+      </div>
+    </div>
+
+    <!-- 雪花 +7 -->
+    <div class="item" data-key="draw_snow" data-price="7" data-name="雪花" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">雪花</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('draw_snow',-1)">−</div><div class="cn" id="n-draw_snow">1</div><div class="cb" onclick="adj('draw_snow',1)">＋</div>
+        </div>
+        <div class="i-price">+¥7/组</div>
+      </div>
+    </div>
+
+    <!-- 豹纹 +7 -->
+    <div class="item" data-key="draw_leo" data-price="7" data-name="豹纹" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">豹纹</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('draw_leo',-1)">−</div><div class="cn" id="n-draw_leo">1</div><div class="cb" onclick="adj('draw_leo',1)">＋</div>
+        </div>
+        <div class="i-price">+¥7/组</div>
+      </div>
+    </div>
+
+    <!-- 晕染 +8 -->
+    <div class="item" data-key="draw_m" data-price="8" data-name="晕染" onclick="toggle(this)">
+      <div class="chk"></div><div class="i-info"><div class="i-name">晕染</div></div>
+      <div class="i-right">
+        <div class="ctr" onclick="event.stopPropagation()">
+          <div class="cb" onclick="adj('draw_m',-1)">−</div><div class="cn" id="n-draw_m">1</div><div class="cb" onclick="adj('draw_m',1)">＋</div>
+        </div>
+        <div class="i-price">+¥8/组</div>
+      </div>
+    </div>
+
+    <div id="custom-draw"></div>
+  </div>
+</div>
+
+<!-- ④ 立体造型（默认收起） -->
+<div class="sec">
+  <div class="sec-ttl" onclick="toggleSculpt()" style="cursor:pointer;user-select:none">
+    <div class="bar"></div>④ 立体造型
+    <span class="sec-note">点击展开</span>
+    <span id="sculpt-arrow" style="font-size:10px;color:var(--t3);transition:transform .2s;margin-left:4px">▼</span>
+  </div>
+  <div id="sculpt-body" style="display:none">
+
+    <!-- 雕花子分类 -->
+    <div class="sub-ttl" onclick="toggleSub('engrave')">
+      <span>🌸 雕花</span>
+      <span class="sub-arrow" id="arr-engrave">▼</span>
+    </div>
+    <div id="sub-engrave" style="display:none">
+      <div class="item" data-key="sculpt_s1" data-price="20" data-name="单层雕花" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">单层雕花</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj('sculpt_s1',-1)">−</div><div class="cn" id="n-sculpt_s1">1</div><div class="cb" onclick="adj('sculpt_s1',1)">＋</div>
+          </div>
+          <div class="i-price">+¥20/朵</div>
+        </div>
+      </div>
+      <div class="item" data-key="sculpt_d1" data-price="25" data-name="双层雕花" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">双层雕花</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj('sculpt_d1',-1)">−</div><div class="cn" id="n-sculpt_d1">1</div><div class="cb" onclick="adj('sculpt_d1',1)">＋</div>
+          </div>
+          <div class="i-price">+¥25/朵</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 钻石子分类 -->
+    <div class="sub-ttl" onclick="toggleSub('diamond')">
+      <span>💎 钻石</span>
+      <span class="sub-arrow" id="arr-diamond">▼</span>
+    </div>
+    <div id="sub-diamond" style="display:none">
+      <!-- 简单拼钻 +5/指 -->
+      <div class="item" data-key="mosaic_s" data-price="5" data-name="简单拼钻" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">简单拼钻</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('mosaic_s',-1)">−</div><div class="cn" id="n-mosaic_s">1</div><div class="cb" onclick="adj10('mosaic_s',1)">＋</div>
+          </div>
+          <div class="i-price">+¥5/指</div>
+        </div>
+      </div>
+      <!-- 复杂拼钻 +10/指 -->
+      <div class="item" data-key="mosaic_c" data-price="10" data-name="复杂拼钻" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">复杂拼钻</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('mosaic_c',-1)">−</div><div class="cn" id="n-mosaic_c">1</div><div class="cb" onclick="adj10('mosaic_c',1)">＋</div>
+          </div>
+          <div class="i-price">+¥10/指</div>
+        </div>
+      </div>
+      <!-- 超复杂拼钻 +15/指 -->
+      <div class="item" data-key="mosaic_x" data-price="15" data-name="超复杂拼钻" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">超复杂拼钻</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('mosaic_x',-1)">−</div><div class="cn" id="n-mosaic_x">1</div><div class="cb" onclick="adj10('mosaic_x',1)">＋</div>
+          </div>
+          <div class="i-price">+¥15/指</div>
+        </div>
+      </div>
+      <!-- 全手小钻 +10 -->
+      <div class="item" data-key="small_d" data-price="10" data-name="全手小钻" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">全手小钻</div></div>
+        <div class="i-right"><div class="i-price">+¥10</div></div>
+      </div>
+      <!-- 大钻 +5/两颗 -->
+      <div class="item" data-key="big_d" data-price="5" data-name="大钻" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">大钻</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj('big_d',-1)">−</div><div class="cn" id="n-big_d">1</div><div class="cb" onclick="adj('big_d',1)">＋</div>
+          </div>
+          <div class="i-price">+¥5/两颗</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 立体造型子分类 -->
+    <div class="sub-ttl" onclick="toggleSub('threed')">
+      <span>🎨 立体造型</span>
+      <span class="sub-arrow" id="arr-threed">▼</span>
+    </div>
+    <div id="sub-threed" style="display:none">
+      <div class="item" data-key="sculpt3d_s" data-price="10" data-name="简单立体" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">简单立体</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('sculpt3d_s',-1)">−</div><div class="cn" id="n-sculpt3d_s">1</div><div class="cb" onclick="adj10('sculpt3d_s',1)">＋</div>
+          </div>
+          <div class="i-price">+¥10/指</div>
+        </div>
+      </div>
+      <div class="item" data-key="sculpt3d_c" data-price="25" data-name="复杂立体" onclick="toggle(this)">
+        <div class="chk"></div><div class="i-info"><div class="i-name">复杂立体</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('sculpt3d_c',-1)">−</div><div class="cn" id="n-sculpt3d_c">1</div><div class="cb" onclick="adj10('sculpt3d_c',1)">＋</div>
+          </div>
+          <div class="i-price">+¥25/指</div>
+        </div>
+      </div>
+      <div class="item" data-key="sculpt3d_x" data-price="30" data-name="超复杂立体" onclick="toggle(this)">
+        <div class="chk"></div>
+        <div class="i-info"><div class="i-name">超复杂立体</div><div class="i-desc">以实际为准</div></div>
+        <div class="i-right">
+          <div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj10('sculpt3d_x',-1)">−</div><div class="cn" id="n-sculpt3d_x">1</div><div class="cb" onclick="adj10('sculpt3d_x',1)">＋</div>
+          </div>
+          <div class="i-price">+¥30/指</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="custom-sculpt"></div>
+  </div>
+</div>
+
+<!-- 自定义款式（当次报价临时添加） -->
+<div class="sec" id="custom-sec">
+  <div class="sec-ttl"><div class="bar"></div>自定义款式 <span class="sec-note">手动填写</span></div>
+  <div id="custom-list"></div>
+  <div class="custom-add" onclick="addCustom()">＋ 添加自定义工艺</div>
+</div>
+
+<!-- 报价明细 -->
+<div class="qbox" id="qbox">
+  <div class="q-ttl"><div class="bar"></div>报价明细</div>
+  <div id="qlines"></div>
+  <div class="qtot">
+    <div class="qtot-l">合计</div>
+    <div class="qtot-r">
+      <div class="qtot-raw" id="qRaw"></div>
+      <div class="qtot-fin">¥<span id="qFin">0</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 备注栏 -->
+<div class="sec" id="remark-sec" style="display:none">
+  <div class="sec-ttl"><div class="bar"></div>备注</div>
+  <div style="padding:10px 14px">
+    <textarea id="remarkInput" rows="2" placeholder="报价均为款式价，不含卸甲&#10;卸甲：本甲¥15（约15分钟）/ 甲片¥25（约30分钟）" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;outline:none;resize:none;line-height:1.6"></textarea>
+  </div>
+</div>
+
+<button class="copy" id="copyBtn" onclick="copyQuote()">📋 复制报价单发给客户</button>
+<!-- 悬浮底栏 -->
+<div class="fab" id="fab">
+  <div class="fab-info">
+    <div class="fab-items" id="fab-items">未选择任何工艺</div>
+    <div class="fab-prices">
+      <div class="fab-raw" id="fab-raw"></div>
+      <div class="fab-final"><span class="sym">¥</span><span id="fab-final">—</span></div>
+    </div>
+  </div>
+  <button class="fab-btn" onclick="copyQuote()">📋 复制报价单</button>
+</div>
+
+<div style="height:8px"></div>
+<!-- 管理款式弹窗 -->
+<div class="modal-mask" id="modalMask" onclick="closeManage(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <h2>⚙️ 管理自定义款式</h2>
+      <button class="modal-close" onclick="closeManage()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="m-sec-ttl">已保存款式</div>
+      <div id="savedList"><div style="color:var(--t3);font-size:13px;padding:8px 0">暂无自定义款式</div></div>
+
+      <div class="m-sec-ttl" onclick="toggleAddForm()" style="cursor:pointer;user-select:none;margin-top:14px">
+        ＋ 新增款式
+        <span id="add-arrow" style="margin-left:auto;font-size:10px;color:var(--t3);transition:transform .2s;display:inline-block">▼</span>
+      </div>
+      <div id="add-form-body" style="display:none">
+      <div class="add-form">
+        <div class="form-row">
+          <label>款式名称</label>
+          <input type="text" id="newName" placeholder="如：镭射猫眼、水晶甲" />
+        </div>
+        <div class="form-row-2">
+          <div class="form-row" style="margin-bottom:0">
+            <label>计费方式</label>
+            <select id="newType" onchange="toggleUnitLabel()">
+              <option value="fixed">固定价</option>
+              <option value="group">按组（两指）</option>
+              <option value="finger">按指</option>
+              <option value="count">按次</option>
+              <option value="piece">按朵/颗</option>
+            </select>
+          </div>
+          <div class="form-row" style="margin-bottom:0">
+            <label id="priceLabel">价格（¥）</label>
+            <input type="number" id="newPrice" placeholder="0" min="0" />
+          </div>
+        </div>
+        <div class="form-row">
+          <label>所属分类</label>
+          <select id="newCat">
+            <option value="color">② 底色质感</option>
+            <option value="draw">③ 图案装饰</option>
+            <option value="sculpt">④ 立体造型</option>
+          </select>
+        </div>
+        <button class="save-btn" onclick="saveCustomItem()">✅ 保存款式</button>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let basePrice=0,baseName='',rubScope='all',baseExpanded=false;
+
+const unitPrice={cat:20,grad:20,acid:10,dust:5,glitter:5,tiaose:10,ab:10,glitter_gel:20,draw_s:5,draw_complex2:8,draw_sticker2:5,draw_m:8,draw_snow:7,draw_leo:7,draw_french:10,draw_french_full:50,draw_sticker:5,big_d:5,mosaic_s:5,mosaic_c:10,mosaic_x:15,small_d:10,sculpt_s1:20,sculpt_d1:25,sculpt3d_s:10,sculpt3d_c:25,sculpt3d_x:30};
+const countKeys=['glitter','tiaose','ab','glitter_gel']; // 按次计费
+const groupKeys=['draw_s','draw_complex2','draw_sticker2','draw_m','draw_snow','draw_leo','draw_french','draw_sticker'];
+const perFinger=['mosaic_s','mosaic_c'];
+
+// ─── 永久自定义款式 ──────────────────────────────────
+const STORAGE_KEY='nail_custom_items';
+let savedItems=[];
+
+function loadSavedItems(){
+  try{ savedItems=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+  catch(e){ savedItems=[]; }
+  renderSavedInSections();
+  renderSavedList();
+}
+
+const unitLabels={fixed:'固定价',group:'每组',finger:'每指',count:'每次',piece:'每朵/颗'};
+const catMap={color:'custom-color',draw:'custom-draw',sculpt:'custom-sculpt'};
+
+function renderSavedInSections(){
+  ['color','draw','sculpt'].forEach(cat=>{
+    const el=document.getElementById('custom-'+cat);
+    if(!el)return;
+    const items=savedItems.filter(i=>i.cat===cat);
+    el.innerHTML=items.map(i=>`
+      <div class="item" data-key="saved_${i.id}" data-price="${i.price}" data-name="${i.name}" data-type="${i.type}" onclick="toggle(this)">
+        <div class="chk"></div>
+        <div class="i-info"><div class="i-name">${i.name}</div><div class="i-desc">自定义·${unitLabels[i.type]}</div></div>
+        <div class="i-right">
+          ${i.type!=='fixed'?`<div class="ctr" onclick="event.stopPropagation()">
+            <div class="cb" onclick="adj('saved_${i.id}',-1)">−</div>
+            <div class="cn" id="n-saved_${i.id}">1</div>
+            <div class="cb" onclick="adj('saved_${i.id}',1)">＋</div>
+          </div>`:''}
+          <div class="i-price">+¥${i.price}${i.type==='fixed'?'':'/'+unitLabels[i.type].replace('每','')}</div>
+        </div>
+      </div>`).join('');
+  });
+}
+
+function renderSavedList(){
+  const el=document.getElementById('savedList');
+  if(!savedItems.length){
+    el.innerHTML='<div style="color:var(--t3);font-size:13px;padding:8px 0">暂无自定义款式，在下方新增</div>';
+    return;
+  }
+  const catNames={color:'底色质感',draw:'图案装饰',sculpt:'立体造型'};
+  el.innerHTML=savedItems.map(i=>`
+    <div class="saved-item">
+      <div class="s-name">${i.name}</div>
+      <div class="s-price">¥${i.price}<span class="s-cat"> · ${unitLabels[i.type]} · ${catNames[i.cat]}</span></div>
+      <button class="s-del" onclick="deleteItem('${i.id}')">×</button>
+    </div>`).join('');
+}
+
+function saveCustomItem(){
+  const name=document.getElementById('newName').value.trim();
+  const price=parseFloat(document.getElementById('newPrice').value);
+  const type=document.getElementById('newType').value;
+  const cat=document.getElementById('newCat').value;
+  if(!name){ showToast('请填写款式名称'); return; }
+  if(!price||price<=0){ showToast('请填写有效价格'); return; }
+  const id='item_'+Date.now();
+  savedItems.push({id,name,price,type,cat});
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(savedItems));
+  document.getElementById('newName').value='';
+  document.getElementById('newPrice').value='';
+  if(addFormOpen) toggleAddForm();
+  renderSavedInSections();
+  renderSavedList();
+  showToast('✅ 款式已永久保存');
+}
+
+function deleteItem(id){
+  savedItems=savedItems.filter(i=>i.id!==id);
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(savedItems));
+  renderSavedInSections();
+  renderSavedList();
+  calc();
+  showToast('已删除');
+}
+
+function toggleUnitLabel(){
+  const type=document.getElementById('newType').value;
+  const labels={fixed:'价格（¥）',group:'每组价格（¥）',finger:'每指价格（¥）',count:'每次价格（¥）',piece:'每朵/颗价格（¥）'};
+  document.getElementById('priceLabel').textContent=labels[type]||'价格（¥）';
+}
+
+let addFormOpen=false;
+function toggleAddForm(){
+  addFormOpen=!addFormOpen;
+  document.getElementById('add-form-body').style.display=addFormOpen?'block':'none';
+  document.getElementById('add-arrow').style.transform=addFormOpen?'rotate(180deg)':'';
+}
+
+function openManage(){
+  document.getElementById('modalMask').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeManage(e){
+  if(e&&e.target!==document.getElementById('modalMask'))return;
+  document.getElementById('modalMask').classList.remove('show');
+  document.body.style.overflow='';
+  if(addFormOpen) toggleAddForm();
+}
+
+// ─── 自定义款式（当次临时） ──────────────────────────
+let customId=0;
+function addCustom(){
+  const id='c'+customId++;
+  const row=document.createElement('div');
+  row.className='custom-row'; row.id='row-'+id;
+  row.innerHTML=`
+    <input type="text" placeholder="款式名称" id="cname-${id}" oninput="calc()" />
+    <input type="number" placeholder="价格" class="price-inp" id="cprice-${id}" min="0" oninput="calc()" />
+    <button class="del" onclick="delCustom('${id}')">×</button>`;
+  document.getElementById('custom-list').appendChild(row);
+  document.getElementById('cname-'+id).focus();
+  calc();
+}
+function delCustom(id){
+  document.getElementById('row-'+id)?.remove(); calc();
+}
+function getCustomLines(){
+  const lines=[];
+  document.querySelectorAll('.custom-row').forEach(row=>{
+    const id=row.id.replace('row-','');
+    const name=document.getElementById('cname-'+id)?.value.trim();
+    const price=parseFloat(document.getElementById('cprice-'+id)?.value)||0;
+    if(name&&price>0) lines.push({name,price});
+  });
+  return lines;
+}
+
+function roundUp38(n){
+  if(n<=0)return n;
+  const m=n%10;
+  if(m===3||m===8)return n;
+  if(m<3)return n-m+3;
+  if(m<8)return n-m+8;
+  return n-m+13;
+}
+
+let sculptExpanded=false;
+function toggleSculpt(){
+  sculptExpanded=!sculptExpanded;
+  document.getElementById('sculpt-body').style.display=sculptExpanded?'block':'none';
+  document.getElementById('sculpt-arrow').style.transform=sculptExpanded?'rotate(180deg)':'';
+  document.querySelector('#sculpt-arrow').previousElementSibling.textContent=sculptExpanded?'点击收起':'点击展开';
+}
+
+function pickBase(el){
+  document.querySelectorAll('[data-group="base"]').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  basePrice=+el.dataset.price; baseName=el.dataset.name; calc();
+}
+
+let drawExpanded=false;
+function toggleDraw(){
+  drawExpanded=!drawExpanded;
+  document.getElementById('draw-more').style.display=drawExpanded?'block':'none';
+  document.getElementById('draw-txt').textContent=drawExpanded?'收起':'更多图案';
+  document.getElementById('draw-arrow').style.transform=drawExpanded?'rotate(180deg)':'';
+}
+
+let colorExpanded=false;
+function toggleColor(){
+  colorExpanded=!colorExpanded;
+  document.getElementById('color-more').style.display=colorExpanded?'block':'none';
+  document.getElementById('color-txt').textContent=colorExpanded?'收起':'更多工艺';
+  document.getElementById('color-arrow').style.transform=colorExpanded?'rotate(180deg)':'';
+}
+
+function toggleMore(){
+  baseExpanded=!baseExpanded;
+  document.getElementById('base-more').style.display=baseExpanded?'block':'none';
+  document.getElementById('more-txt').textContent=baseExpanded?'收起':'更多选项';
+  document.getElementById('more-arrow').style.transform=baseExpanded?'rotate(180deg)':'';
+}
+
+function toggle(el){
+  el.classList.toggle('selected');
+  const key=el.dataset.key;
+  const on=el.classList.contains('selected');
+
+  if(key==='draw_french'){
+    document.getElementById('french-scope').classList.toggle('show', on);
+  }
+  if(key==='blush'){
+    document.getElementById('blush-scope').classList.toggle('show', on);
+    if(!on){ document.getElementById('blush-groups-row').style.display='none'; }
+  }
+  if(key==='rub'){
+    document.getElementById('rub-scope').classList.toggle('show', on);
+    if(!on){ document.getElementById('rub-groups-row').style.display='none'; }
+  }
+  if(key==='grad'){
+    document.getElementById('grad-scope').classList.toggle('show', on);
+    if(!on){ document.getElementById('grad-groups-row').style.display='none'; }
+  }
+  calc();
+}
+
+function toggleChip(el){el.classList.toggle('selected');calc();}
+
+function adj(key,d){
+  const el=document.getElementById('n-'+key); if(!el)return;
+  let v=+el.textContent+d;
+  if(v<1)v=1;
+  el.textContent=v; calc();
+}
+function adj10(key,d){ adj(key,d); }
+function getN(key){return+(document.getElementById('n-'+key)?.textContent||1);}
+
+let frenchScope='full';
+function setFrenchScope(s){
+  frenchScope=s;
+  document.getElementById('french-group').className='sbtn'+(s==='group'?' active':'');
+  document.getElementById('french-full').className='sbtn'+(s==='full'?' active':'');
+  calc();
+}
+
+let gradScope='all';
+function setGradScope(s){
+  gradScope=s;
+  document.getElementById('grad-all').className='sbtn'+(s==='all'?' active':'');
+  document.getElementById('grad-one').className='sbtn'+(s==='one'?' active':'');
+  const on=!!document.querySelector('[data-key="grad"].selected');
+  document.getElementById('grad-groups-row').style.display=(s==='one'&&on)?'flex':'none';
+  calc();
+}
+
+const subState={engrave:false,diamond:false,threed:false};
+function toggleSub(id){
+  subState[id]=!subState[id];
+  document.getElementById('sub-'+id).style.display=subState[id]?'block':'none';
+  document.getElementById('arr-'+id).style.transform=subState[id]?'rotate(180deg)':'';
+}
+
+let blushScope='all';
+function setBlushScope(s){
+  blushScope=s;
+  document.getElementById('blush-all').className='sbtn'+(s==='all'?' active':'');
+  document.getElementById('blush-one').className='sbtn'+(s==='one'?' active':'');
+  const on=!!document.querySelector('[data-key="blush"].selected');
+  document.getElementById('blush-groups-row').style.display=(s==='one'&&on)?'flex':'none';
+  calc();
+}
+
+function setScope(s){
+  rubScope=s;
+  document.getElementById('rub-all').className='sbtn'+(s==='all'?' active':'');
+  document.getElementById('rub-two').className='sbtn'+(s==='two'?' active':'');
+  const on=!!document.querySelector('[data-key="rub"].selected');
+  document.getElementById('rub-groups-row').style.display=(s==='two'&&on)?'flex':'none';
+  calc();
+}
+
+function calc(){
+  const lines=[]; let raw=basePrice;
+  if(basePrice) lines.push({name:baseName,price:basePrice});
+
+  // 单排 items
+  document.querySelectorAll('.item.selected:not([data-group="base"])').forEach(el=>{
+    const key=el.dataset.key, name=el.dataset.name; let price=0;
+    if(key==='blush'){
+      if(blushScope==='all'){
+        price=20;
+        lines.push({name:'腮红（全手）',price});
+      } else {
+        const g=getN('blush_groups');
+        price=5*g;
+        lines.push({name:g>1?`腮红×${g}组`:'腮红（一组）',price});
+      }
+    } else if(key==='rub'){
+      if(rubScope==='all'){
+        price=30;
+        lines.push({name:'蹭粉（全手）',price});
+      } else {
+        const g=getN('rub_groups');
+        price=8*g;
+        lines.push({name:g>1?`蹭粉×${g}组`:'蹭粉（一组）',price});
+      }
+    } else if(key==='cat'){
+      const c=getN('cat'); price=20+(c-1)*5;
+      lines.push({name:c>1?`猫眼（${c}色）`:'猫眼',price});
+    } else if(key==='grad'){
+      const c=getN('grad');
+      if(gradScope==='all'){
+        price=20+(c-1)*5;
+        lines.push({name:c>1?`渐变全手（${c}色）`:'渐变（全手）',price});
+      } else {
+        const g=getN('grad_groups');
+        price=5*g+(c-1)*5;
+        lines.push({name:c>1?`渐变×${g}组（${c}色）`:g>1?`渐变×${g}组`:'渐变（一组）',price});
+      }
+    } else if(key.startsWith('saved_')){
+      const sid=key.replace('saved_','');
+      const si=savedItems.find(i=>i.id===sid);
+      if(si){
+        const n=si.type==='fixed'?1:getN(key);
+        price=si.price*n;
+        const uMap={fixed:'',group:'组',finger:'指',count:'次',piece:'朵'};
+        const u=uMap[si.type];
+        lines.push({name:n>1?`${si.name}×${n}${u}`:si.name,price});
+      }
+    } else if(unitPrice[key]!==undefined){
+      const n=getN(key);
+      if(key==='draw_french'){
+        if(frenchScope==='full'){
+          price=50;
+          lines.push({name:'法式全手',price});
+        } else {
+          price=10*n;
+          lines.push({name:n>1?`法式×${n}组`:'法式',price});
+        }
+      } else {
+        price=unitPrice[key]*n;
+        const unit=groupKeys.includes(key)||key==='dust'?'组':['acid','mosaic_s','mosaic_c','mosaic_x','sculpt3d_s','sculpt3d_c','sculpt3d_x'].includes(key)?'指':key==='big_d'?'两颗':countKeys.includes(key)?'次':'朵';
+        const label=n>1?`${name}×${n}${unit}`:name;
+        lines.push({name:label,price});
+      }
+    }
+    raw+=price;
+  });
+
+  // chip items
+  document.querySelectorAll('.chip.selected').forEach(el=>{
+    const key=el.dataset.key, name=el.dataset.name;
+    const price=+el.dataset.price;
+    lines.push({name,price}); raw+=price;
+  });
+
+  // 自定义款式
+  const customLines=getCustomLines();
+  customLines.forEach(l=>{lines.push(l);raw+=l.price;});
+
+  const final=lines.length?roundUp38(raw):0;
+
+  // 基础款置顶，其余按价格低到高
+  const baseLines=lines.filter(l=>l.name===baseName);
+  const restLines=lines.filter(l=>l.name!==baseName).sort((a,b)=>a.price-b.price);
+  const sorted=[...baseLines,...restLines];
+
+  // 悬浮底栏
+  const fab=document.getElementById('fab');
+  const fabItems=document.getElementById('fab-items');
+  const fabRaw=document.getElementById('fab-raw');
+  const fabFinal=document.getElementById('fab-final');
+  if(lines.length){
+    fab.classList.add('show');
+    fabItems.textContent=`已选 ${lines.length} 项工艺`;
+    fabRaw.textContent=raw!==final?`¥${raw}`:'';
+    fabFinal.textContent=final;
+  } else {
+    fab.classList.remove('show');
+  }
+
+  const qbox=document.getElementById('qbox');
+  const btn=document.getElementById('copyBtn');
+  const remarkSec=document.getElementById('remark-sec');
+  if(!lines.length){
+    qbox.classList.remove('show');
+    btn.classList.remove('show');
+    remarkSec.style.display='none';
+    return;
+  }
+  qbox.classList.add('show');
+  btn.classList.add('show');
+  remarkSec.style.display='block';
+  document.getElementById('qlines').innerHTML=sorted.map(l=>`<div class="qline"><span class="qn">${l.name}</span><span class="qp">¥${l.price}</span></div>`).join('');
+  document.getElementById('qRaw').textContent=raw!==final?`计算值 ¥${raw}`:'';
+  document.getElementById('qFin').textContent=final;
+}
+
+function copyQuote(){
+  const lines=[...document.querySelectorAll('.qline')];
+  let txt='【小小糖美甲报价单】\n';
+  lines.forEach(l=>txt+=`${l.querySelector('.qn').textContent}  ${l.querySelector('.qp').textContent}\n`);
+  const raw=document.getElementById('qRaw').textContent;
+  const fin=document.getElementById('qFin').textContent;
+  if(raw)txt+=`${raw}\n`;
+  txt+=`──────────────\n报价合计  ¥${fin}\n`;
+  const remark=document.getElementById('remarkInput').value.trim();
+  const defaultRemark='报价均为款式价，不含卸甲\n卸甲：本甲¥15（约15分钟）/ 甲片¥25（约30分钟）';
+  txt+=`\n📌 ${remark||defaultRemark}`;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>showToast('✅ 已复制，粘贴发给客户'));
+  } else {
+    const ta=document.createElement('textarea');
+    ta.value=txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('✅ 已复制，粘贴发给客户');
+  }
+}
+
+function resetAll(){
+  document.querySelectorAll('.item.selected,.chip.selected').forEach(e=>e.classList.remove('selected'));
+  document.getElementById('french-scope').classList.remove('show');
+  frenchScope='full'; setFrenchScope('full');
+  document.getElementById('rub-scope').classList.remove('show');
+  document.getElementById('grad-scope').classList.remove('show');
+  document.getElementById('blush-scope').classList.remove('show');
+  document.getElementById('rub-groups-row').style.display='none';
+  document.getElementById('grad-groups-row').style.display='none';
+  document.getElementById('blush-groups-row').style.display='none';
+  rubScope='all'; setScope('all');
+  gradScope='all'; setGradScope('all');
+  blushScope='all'; setBlushScope('all');
+  Object.keys(subState).forEach(k=>{subState[k]=false;document.getElementById('sub-'+k).style.display='none';document.getElementById('arr-'+k).style.transform=''});
+  basePrice=0; baseName='';
+  document.getElementById('custom-list').innerHTML='';
+  customId=0;
+  document.querySelectorAll('.cn').forEach(el=>el.textContent='1');
+  document.getElementById('remarkInput').value='';
+  document.getElementById('remark-sec').style.display='none';
+  document.getElementById('fab').classList.remove('show');
+  if(drawExpanded) toggleDraw();
+  if(colorExpanded) toggleColor();
+  if(baseExpanded) toggleMore();
+  if(sculptExpanded) toggleSculpt();
+  calc(); showToast('已清空');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// 初始化
+loadSavedItems();
+</script>
+</body>
+</html>
